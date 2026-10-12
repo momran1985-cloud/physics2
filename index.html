@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختبار الفيزياء التفاعلي – طبيعة العلم والمنهج العلمي والسلامة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f2f6f8; --card:#ffffff; --ink:#16313a; --muted:#5f7681;
+    --brand:#0f766e; --brand-d:#0b5a54; --brand-l:#d9f0ed;
+    --ok:#15803d; --ok-l:#dcfce7; --bad:#b91c1c; --bad-l:#fee2e2;
+    --warn:#b45309; --warn-l:#fef3c7; --line:#d7e2e7;
+    --radius:16px; --shadow:0 8px 28px rgba(15,60,70,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Tajawal","Segoe UI",Tahoma,Arial,sans-serif;
+    background:linear-gradient(160deg,#e6f3f1 0%,#f2f6f8 45%,#eaf0f6 100%);
+    color:var(--ink); min-height:100vh; line-height:1.7; font-size:17px;
+  }
+  header.top{
+    position:sticky; top:0; z-index:10; background:rgba(255,255,255,.94);
+    backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
+    padding:10px 16px; display:none;
+  }
+  header.top .row{max-width:880px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .who{font-weight:700; font-size:.95rem}
+  .who small{color:var(--muted); font-weight:500}
+  .score-chip{
+    background:var(--brand); color:#fff; border-radius:999px; padding:4px 16px;
+    font-weight:800; font-size:1rem; white-space:nowrap;
+  }
+  .score-chip span{font-size:.8rem; font-weight:500; opacity:.9}
+  .bar-wrap{max-width:880px; margin:8px auto 0}
+  .bar{height:10px; background:#e3edf0; border-radius:999px; overflow:hidden}
+  .bar > i{display:block; height:100%; width:0; background:linear-gradient(90deg,#14b8a6,#0f766e); border-radius:999px; transition:width .45s ease}
+  .bar-meta{display:flex; justify-content:space-between; color:var(--muted); font-size:.82rem; margin-top:3px}
+  .stepper{display:flex; gap:6px; margin-top:6px}
+  .stepper b{
+    flex:1; text-align:center; font-size:.78rem; font-weight:700; padding:3px 4px; border-radius:8px;
+    background:#eef3f5; color:var(--muted); border:1px solid transparent;
+  }
+  .stepper b.cur{background:var(--brand-l); color:var(--brand-d); border-color:var(--brand)}
+  .stepper b.done{background:var(--ok-l); color:var(--ok)}
+  main{max-width:880px; margin:0 auto; padding:22px 16px 60px}
+  .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 24px; border:1px solid #e6eef1}
+  section{display:none}
+  section.active{display:block; animation:fade .35s ease}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  h1{margin:0 0 6px; font-size:1.7rem; color:var(--brand-d); font-weight:800}
+  h2{margin:0 0 10px; font-size:1.35rem; color:var(--brand-d); font-weight:800}
+  h3{margin:18px 0 8px; font-size:1.05rem}
+  p.lead{color:var(--muted); margin:0 0 18px}
+  .logo{
+    width:64px; height:64px; border-radius:18px; background:var(--brand-l); display:grid; place-items:center;
+    font-size:2rem; margin-bottom:10px;
+  }
+  label{display:block; font-weight:700; margin:14px 0 6px}
+  input[type=text]{
+    width:100%; padding:13px 14px; border:2px solid var(--line); border-radius:12px; font:inherit; background:#fbfdfd;
+    transition:border .2s, box-shadow .2s;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 4px rgba(15,118,110,.15)}
+  .hint{font-size:.85rem; color:var(--muted); margin-top:4px}
+  .err{color:var(--bad); font-weight:700; margin-top:10px; min-height:1.4em}
+  button{font:inherit; cursor:pointer; border:0; border-radius:12px; padding:12px 22px; font-weight:700; transition:transform .1s, background .2s, opacity .2s}
+  button:active{transform:scale(.98)}
+  .btn{background:var(--brand); color:#fff}
+  .btn:hover{background:var(--brand-d)}
+  .btn.sec{background:#eaf1f3; color:var(--ink)}
+  .btn.sec:hover{background:#dce8ec}
+  .btn.warn{background:var(--warn); color:#fff}
+  .btn.warn:hover{background:#92400e}
+  .btn[disabled]{opacity:.5; cursor:not-allowed}
+  .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px}
+  .info-list{margin:10px 0 0; padding-inline-start:20px}
+  .info-list li{margin:4px 0}
+  .badge{display:inline-block; background:var(--brand-l); color:var(--brand-d); border-radius:8px; padding:2px 10px; font-weight:800; font-size:.85rem}
+  .qhead{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .qnum{color:var(--muted); font-weight:700}
+  .qtext{font-size:1.25rem; font-weight:700; margin:6px 0 16px; line-height:1.8}
+  .opts{display:grid; gap:10px}
+  .opt{
+    text-align:right; background:#f8fbfc; border:2px solid var(--line); border-radius:12px; padding:13px 16px;
+    font-weight:500; display:flex; gap:12px; align-items:center; width:100%; color:var(--ink);
+  }
+  .opt:hover:not(.locked){border-color:var(--brand); background:#eef9f7}
+  .opt .k{
+    flex:0 0 32px; height:32px; border-radius:50%; background:#e4eef1; display:grid; place-items:center; font-weight:800; font-size:.9rem
+  }
+  .opt.correct{background:var(--ok-l); border-color:var(--ok)}
+  .opt.correct .k{background:var(--ok); color:#fff}
+  .opt.wrong{background:var(--bad-l); border-color:var(--bad)}
+  .opt.wrong .k{background:var(--bad); color:#fff}
+  .opt.locked{cursor:default}
+  .expl{margin-top:14px; padding:12px 14px; border-radius:12px; background:var(--warn-l); color:#78350f; display:none}
+  .expl.show{display:block}
+  .ring{
+    --p:0; width:150px; height:150px; border-radius:50%; margin:6px auto 4px;
+    background:conic-gradient(var(--c,#0f766e) calc(var(--p)*1%), #e3edf0 0);
+    display:grid; place-items:center;
+  }
+  .ring div{width:116px; height:116px; border-radius:50%; background:#fff; display:grid; place-items:center; text-align:center}
+  .ring strong{font-size:2rem; line-height:1; color:var(--ink)}
+  .ring small{display:block; color:var(--muted); font-size:.8rem}
+  .level{text-align:center; font-weight:800; font-size:1.15rem; margin:6px 0 10px}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .box{border-radius:14px; padding:14px 16px}
+  .box.good{background:var(--ok-l)}
+  .box.need{background:var(--warn-l)}
+  .box h3{margin:0 0 6px}
+  .box ul{margin:0; padding-inline-start:20px}
+  .box li{margin:3px 0}
+  table{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95rem}
+  th,td{padding:10px 8px; border-bottom:1px solid var(--line); text-align:right; vertical-align:middle}
+  th{background:#f0f6f7; font-size:.85rem; color:var(--muted)}
+  .tag{display:inline-block; padding:2px 10px; border-radius:999px; font-weight:700; font-size:.8rem}
+  .tag.ok{background:var(--ok-l); color:var(--ok)}
+  .tag.no{background:var(--warn-l); color:var(--warn)}
+  .total-box{
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    background:var(--brand-l); border-radius:14px; padding:14px 18px; margin-top:14px; font-weight:800
+  }
+  .total-box .big{font-size:1.8rem; color:var(--brand-d)}
+  .notice{margin-top:14px; padding:12px 14px; border-radius:12px; font-weight:500}
+  .notice.ok{background:var(--ok-l); color:#14532d}
+  .notice.bad{background:var(--bad-l); color:#7f1d1d}
+  .notice.info{background:#e0f2fe; color:#075985}
+  .hidden{display:none !important}
+  @media (max-width:640px){
+    body{font-size:16px}
+    .grid2{grid-template-columns:1fr}
+    .card{padding:20px 16px}
+    h1{font-size:1.4rem}
+    .qtext{font-size:1.1rem}
+    th:nth-child(4),td:nth-child(4){display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top" id="topbar">
+  <div class="row">
+    <div class="who" id="whoLine"></div>
+    <div class="score-chip" id="scoreChip">0 <span>/ 30</span></div>
+  </div>
+  <div class="bar-wrap">
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="bar-meta"><span id="barLabel">التقدم: 0%</span><span id="barCount">0 / 30 سؤالاً</span></div>
+    <div class="stepper" id="stepper"></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1) تسجيل الدخول -->
+  <section id="s-login" class="active">
+    <div class="card">
+      <div class="logo">⚛️</div>
+      <h1>اختبار الفيزياء التفاعلي</h1>
+      <p class="lead">طبيعة العلوم، المنهج العلمي، وإجراءات السلامة في المختبر. أدخل بياناتك لبدء الاختبار.</p>
+      <form id="loginForm" autocomplete="off" novalidate>
+        <label for="stuName">الاسم الثلاثي</label>
+        <input type="text" id="stuName" placeholder="مثال: أحمد محمد العلي" required>
+        <label for="stuId">رقم الهوية / الرقم الأكاديمي</label>
+        <input type="text" id="stuId" inputmode="numeric" placeholder="أدخل أرقاماً فقط" maxlength="12" required>
+        <div class="hint">يُستخدم الاسم والرقم لإرسال تقرير نتيجتك إلى معلم المادة.</div>
+        <div class="err" id="loginErr" role="alert"></div>
+        <div class="actions"><button class="btn" type="submit">بدء الاختبار ←</button></div>
+      </form>
+      <h3>تعليمات الاختبار</h3>
+      <ul class="info-list">
+        <li>3 مؤشرات، في كل مؤشر 10 أسئلة، ودرجة واحدة لكل إجابة صحيحة (المجموع 30).</li>
+        <li>تظهر لك تغذية راجعة تفصيلية بعد إنهاء كل مؤشر.</li>
+        <li>إن لم تبلغ نسبة الإتقان (<span id="masteryTxt">80</span>%) يمكنك إعادة هذا المؤشر وحده.</li>
+        <li>عند الانتهاء يُرسل تقريرك تلقائياً إلى معلمك.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2) مقدمة المؤشر -->
+  <section id="s-intro">
+    <div class="card">
+      <span class="badge" id="inBadge"></span>
+      <h2 id="inTitle" style="margin-top:10px"></h2>
+      <p class="lead" id="inDesc"></p>
+      <h3>مفاهيم يغطيها هذا المؤشر</h3>
+      <ul class="info-list" id="inTopics"></ul>
+      <div class="actions"><button class="btn" id="inStart">ابدأ أسئلة المؤشر ←</button></div>
+    </div>
+  </section>
+
+  <!-- 3) الأسئلة -->
+  <section id="s-quiz">
+    <div class="card">
+      <div class="qhead">
+        <span class="badge" id="qBadge"></span>
+        <span class="qnum" id="qNum"></span>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="expl" id="qExpl"></div>
+      <div class="actions"><button class="btn hidden" id="qNext">التالي ←</button></div>
+    </div>
+  </section>
+
+  <!-- 4) التغذية الراجعة -->
+  <section id="s-feedback">
+    <div class="card">
+      <span class="badge" id="fbBadge"></span>
+      <h2 id="fbTitle" style="margin-top:10px"></h2>
+      <div class="ring" id="fbRing"><div><span><strong id="fbPct">0%</strong><small id="fbScore">0 / 10</small></span></div></div>
+      <div class="level" id="fbLevel"></div>
+      <div class="grid2">
+        <div class="box good"><h3>✅ نقاط القوة</h3><ul id="fbStrong"></ul></div>
+        <div class="box need"><h3>🔎 مفاهيم تحتاج تحسيناً</h3><ul id="fbWeak"></ul></div>
+      </div>
+      <div class="notice info" id="fbAdvice"></div>
+      <div class="actions">
+        <button class="btn warn hidden" id="fbRetry">🔁 إعادة اختبار هذا المؤشر</button>
+        <button class="btn" id="fbNext">المتابعة ←</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5) الملخص والإرسال -->
+  <section id="s-summary">
+    <div class="card">
+      <h2>الملخص النهائي</h2>
+      <p class="lead" id="sumLead">راجع نتائجك. يمكنك إعادة أي مؤشر لم تبلغ فيه نسبة الإتقان قبل إرسال التقرير.</p>
+      <table>
+        <thead><tr><th>المؤشر</th><th>الدرجة</th><th>الحالة</th><th>المحاولات</th><th></th></tr></thead>
+        <tbody id="sumBody"></tbody>
+      </table>
+      <div class="total-box"><span>الدرجة الكلية</span><span class="big" id="sumTotal">0 / 30</span></div>
+      <div class="actions">
+        <button class="btn" id="sumSend">📨 إنهاء الاختبار وإرسال التقرير للمعلم</button>
+      </div>
+      <div id="sendMsg"></div>
+      <div id="fallback" class="hidden">
+        <div class="actions">
+          <a id="mailLink" class="btn sec" style="text-decoration:none; display:inline-block; padding:12px 22px; border-radius:12px; font-weight:700">✉️ إرسال عبر البريد</a>
+          <button class="btn sec" id="copyBtn">📋 نسخ التقرير</button>
+          <button class="btn sec" id="dlBtn">⬇️ تنزيل التقرير</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ===================== إعدادات الربط (عدّلها قبل النشر) ===================== */
+const CONFIG = {
+  // الخيار 1: Formspree — أنشئ نموذجاً على formspree.io وضع رابطه هنا، مثل: "https://formspree.io/f/xxxxxxx"
+  FORMSPREE_ENDPOINT: "",
+  // الخيار 2: Google Apps Script (Web App) — رابط النشر؛ انظر الشيفرة النموذجية في أسفل الملف
+  APPS_SCRIPT_URL: "",
+  // بريد المعلم (يُستخدم في خيار الإرسال عبر البريد البديل)
+  TEACHER_EMAIL: "",
+  // نسبة الإتقان المطلوبة لكل مؤشر
+  MASTERY: 80,
+  TEST_TITLE: "اختبار الفيزياء: طبيعة العلوم والمنهج العلمي والسلامة"
+};
+
+/* ===================== بنك الأسئلة ===================== */
+// o: الخيارات، a: فهرس الإجابة الصحيحة (قبل الخلط)، c: المفهوم، e: توضيح
+const INDICATORS = [
+  {
+    id:"1.6.6", short:"طبيعة العلم",
+    title:"المعيار 1.6.6: معرفة طبيعة العلوم وتاريخ تطور علم الفيزياء",
+    desc:"يوضح هذا المؤشر طبيعة العلم وغاياته، وإسهامات الحضارات والعلماء، والفرق بين الحقيقة والقانون والنظرية.",
+    topics:["خصائص العلم: قابلية التعديل، الدليل الحسي، الحياد","مفهوم علم الفيزياء وغاياته","إسهامات الحضارة الإسلامية والحضارات الأخرى","الأحداث التاريخية المؤثرة في الفيزياء","الحقيقة والمفهوم والقانون والنظرية"],
+    questions:[
+      {q:"عندما يتغير تفسير علمي بعد ظهور أدلة جديدة، فإن ذلك يُظهر أي خاصية من خصائص العلم؟",
+       o:["قابلية التعديل","الثبات المطلق","الاعتماد على الرأي الشخصي","عدم قابلية الاختبار"],a:0,c:"قابلية العلم للتعديل",
+       e:"المعرفة العلمية قابلة للتعديل والتطوير كلما ظهرت أدلة جديدة."},
+      {q:"عبارة «يعتمد العلم على الدليل الحسي» تعني أن المعرفة العلمية تُبنى على:",
+       o:["الملاحظة والقياس والتجريب","الحدس والتخمين","التقاليد الموروثة","ما يتفق عليه معظم الناس"],a:0,c:"الاعتماد على الدليل الحسي",
+       e:"الدليل الحسي هو ما يمكن ملاحظته وقياسه وتكرار اختباره."},
+      {q:"أن تكون النتائج العلمية غير متأثرة بميول الباحث ومعتقداته الشخصية يُسمّى:",
+       o:["حياد العلم","قابلية التعديل","غاية العلم","التنبؤ العلمي"],a:0,c:"حياد العلم",
+       e:"الحياد يعني أن الدليل هو الحَكَم لا رغبات الباحث."},
+      {q:"يُعرَّف علم الفيزياء بأنه العلم الذي يدرس:",
+       o:["المادة والطاقة والعلاقة بينهما","تركيب المركبات الكيميائية فقط","الكائنات الحية وبيئاتها","طبقات الأرض وصخورها"],a:0,c:"مفهوم علم الفيزياء",
+       e:"الفيزياء تدرس المادة والطاقة والتفاعلات بينهما."},
+      {q:"أي مما يلي يُعد من غايات علم الفيزياء؟",
+       o:["تفسير الظواهر الطبيعية والتنبؤ بها","إثبات صحة المعتقدات الشخصية","جمع الآراء دون اختبارها","تجنب استخدام الرياضيات"],a:0,c:"غايات علم الفيزياء",
+       e:"من غايات الفيزياء فهم الظواهر الطبيعية وتفسيرها والتنبؤ بسلوكها."},
+      {q:"اشتهر العالم المسلم الحسن بن الهيثم بإسهامه في تأسيس:",
+       o:["علم البصريات القائم على التجربة","علم الكيمياء الحيوية","نظرية النسبية","قانون الجذب العام"],a:0,c:"إسهامات الحضارة الإسلامية",
+       e:"ألّف ابن الهيثم «كتاب المناظر» واعتمد التجربة في دراسة الضوء والإبصار."},
+      {q:"أي الأمثلة التالية يُعد «حقيقة علمية» قائمة على الملاحظة المباشرة؟",
+       o:["الماء يتجمد عند 0°س تحت الضغط الجوي المعتاد","الكون بدأ بانفجار عظيم","القوة = الكتلة × التسارع","الذرة تشبه نظاماً شمسياً مصغراً"],a:0,c:"الحقيقة العلمية",
+       e:"الحقيقة ملاحظة قابلة للتحقق المباشر، أما الباقي فنظرية أو قانون أو نموذج."},
+      {q:"أسهم إسحاق نيوتن في تطور الفيزياء بصياغته:",
+       o:["قوانين الحركة وقانون الجذب العام","نموذج الذرة النووي","نظرية الكم","قانون الجذب الكهربائي بين الشحنات"],a:0,c:"إسهامات علماء الحضارات الأخرى",
+       e:"صاغ نيوتن قوانين الحركة الثلاثة وقانون الجذب العام فأسّس الميكانيكا الكلاسيكية."},
+      {q:"أسهم اختراع المحرك البخاري في القرن الثامن عشر في تطور فرع الفيزياء المسمى:",
+       o:["الديناميكا الحرارية","الفيزياء النووية","نظرية الكم","علم الضوء الهندسي"],a:0,c:"الأحداث التاريخية المؤثرة",
+       e:"دفعت محاولات تحسين كفاءة المحركات البخارية إلى دراسة الحرارة والشغل فنشأت الديناميكا الحرارية."},
+      {q:"يختلف القانون العلمي عن النظرية العلمية في أن القانون:",
+       o:["يصف العلاقة بين المتغيرات غالباً بصيغة رياضية بينما تفسّر النظرية سبب حدوثها","يتحول دائماً إلى نظرية بعد إثباته","هو تخمين لم يُختبر بعد","لا يختلف عن النظرية إطلاقاً"],a:0,c:"الفرق بين القانون والنظرية",
+       e:"القانون يصف «ماذا يحدث» والنظرية تفسّر «لماذا يحدث»، وكلاهما مدعوم بالأدلة."}
+    ]
+  },
+  {
+    id:"2.6.6", short:"المنهج العلمي",
+    title:"المعيار 2.6.6: الإلمام بالمنهج العلمي وأخلاقياته وتطبيقاته في العلوم",
+    desc:"يقيس هذا المؤشر فهمك لخطوات المنهج العلمي، وتحديد المتغيرات، وجمع البيانات، ومصادر المعرفة، وأخلاقيات البحث.",
+    topics:["مفهوم المنهج العلمي وخطواته","صياغة الفرضية العلمية","المتغيرات المستقلة والتابعة والمضبوطة","جمع البيانات والدقة والضبط","مصادر المعرفة وأخلاقيات البحث"],
+    questions:[
+      {q:"المنهج العلمي هو:",
+       o:["خطوات منظمة يتبعها الباحث لدراسة الظواهر والإجابة عن الأسئلة بالدليل","قائمة بالقوانين الفيزيائية المحفوظة","رأي أحد العلماء في ظاهرة ما","جهاز يُستخدم في المختبر"],a:0,c:"مفهوم المنهج العلمي",
+       e:"المنهج العلمي طريقة منظمة للوصول إلى المعرفة بالملاحظة والتجريب والاستنتاج."},
+      {q:"بعد صياغة الفرضية في المنهج العلمي، تكون الخطوة المنطقية التالية:",
+       o:["تصميم تجربة لاختبارها","كتابة الاستنتاج النهائي","نشر النتائج مباشرة","إهمال الفرضية"],a:0,c:"خطوات المنهج العلمي",
+       e:"تُختبر الفرضية بتجربة مضبوطة قبل جمع النتائج والاستنتاج."},
+      {q:"أي العبارات التالية تصلح فرضيةً علمية قابلة للاختبار؟",
+       o:["كلما زاد طول البندول زاد زمنه الدوري","الفيزياء أجمل العلوم","البندول يتحرك بسبب قوة خفية لا تُقاس","لا يمكن قياس زمن البندول"],a:0,c:"صياغة الفرضية",
+       e:"الفرضية الجيدة تربط بين متغيرين ويمكن اختبارها بالقياس."},
+      {q:"في تجربة لدراسة أثر طول البندول في زمنه الدوري، المتغير المستقل هو:",
+       o:["طول البندول","الزمن الدوري","كتلة الثقل","درجة حرارة الغرفة"],a:0,c:"المتغير المستقل",
+       e:"المتغير المستقل هو ما يغيّره الباحث عمداً لدراسة أثره."},
+      {q:"في تجربة البندول نفسها، المتغير التابع هو:",
+       o:["الزمن الدوري","طول الخيط","كتلة الثقل","زاوية الإزاحة"],a:0,c:"المتغير التابع",
+       e:"المتغير التابع هو ما نقيسه ويتأثر بتغيير المتغير المستقل."},
+      {q:"أي مما يلي يجب إبقاؤه ثابتاً في تجربة البندول (متغير مضبوط)؟",
+       o:["كتلة الثقل وزاوية الإزاحة الابتدائية","طول الخيط","الزمن الدوري المقاس","جميع المتغيرات يجب تغييرها معاً"],a:0,c:"المتغيرات المضبوطة",
+       e:"نضبط كل ما عدا المتغير المستقل ليتضح أثره وحده."},
+      {q:"لزيادة موثوقية البيانات في تجربة ما، يُفضّل:",
+       o:["تكرار القياس عدة مرات وأخذ المتوسط","الاكتفاء بقياس واحد","حذف القراءات المخالفة لتوقعك","تقدير القراءات دون قياس"],a:0,c:"جمع البيانات وتسجيلها",
+       e:"التكرار يقلل أثر الأخطاء العشوائية ويزيد الثقة بالنتائج."},
+      {q:"قراءات متقاربة جداً من بعضها لكنها بعيدة عن القيمة الحقيقية تدل على قياس:",
+       o:["عالي الضبط ومنخفض الدقة","عالي الدقة ومنخفض الضبط","عالي الدقة والضبط معاً","منخفض الدقة والضبط معاً"],a:0,c:"الدقة والضبط في القياس",
+       e:"الضبط تقارب القراءات من بعضها، والدقة قربها من القيمة الحقيقية."},
+      {q:"أي المصادر التالية أكثر موثوقية للبحث عن نتائج تجربة علمية؟",
+       o:["مجلة علمية محكّمة","منشور مجهول المصدر في وسائل التواصل","إعلان تجاري","رأي أحد الأصدقاء"],a:0,c:"مصادر المعرفة العلمية",
+       e:"المجلات المحكّمة تخضع لمراجعة المتخصصين قبل النشر."},
+      {q:"أي السلوكيات التالية تُعد من أخلاقيات البحث العلمي؟",
+       o:["توثيق المصادر وعدم تعديل البيانات لتوافق التوقع","تعديل القراءات لتطابق الفرضية","نسخ نتائج الآخرين دون الإشارة إليهم","إخفاء النتائج المخالفة للفرضية"],a:0,c:"أخلاقيات البحث العلمي",
+       e:"الأمانة العلمية تقتضي نسبة الأفكار لأصحابها وعرض البيانات كما هي."}
+    ]
+  },
+  {
+    id:"3.6.6", short:"السلامة في المختبر",
+    title:"المعيار 3.6.6: إجراء التجارب العملية مع مراعاة قواعد السلامة والأمان في المختبر",
+    desc:"يقيس هذا المؤشر معرفتك برموز التحذير، وإجراءات الإسعاف الأولية، والاستخدام الآمن للأدوات والأجهزة.",
+    topics:["رموز السلامة والتحذير","الإسعاف الأولي للعين والحروق","السلامة الكهربائية والحريق","سلامة الليزر والأدوات الزجاجية","قواعد السلوك الآمن في المختبر"],
+    questions:[
+      {q:"رمز اللهب على عبوة مادة كيميائية يدل على أنها:",
+       o:["قابلة للاشتعال","مشعّة","مغذّية","آمنة تماماً"],a:0,c:"رموز التحذير",
+       e:"رمز اللهب يحذّر من مواد قابلة للاشتعال فيجب إبعادها عن مصادر الحرارة."},
+      {q:"رمز الجمجمة والعظمتين المتقاطعتين يحذّر من مادة:",
+       o:["سامة","صالحة للأكل","عديمة اللون","غير متفاعلة"],a:0,c:"رموز التحذير",
+       e:"هذا الرمز يعني مادة سامة قد تضر بالصحة عند الاستنشاق أو اللمس أو الابتلاع."},
+      {q:"رمز البرق (السهم المتعرج) في المختبر يحذّر من:",
+       o:["خطر الصدمة الكهربائية","خطر الإشعاع","خطر الانسكاب","خطر الصوت العالي"],a:0,c:"رموز التحذير",
+       e:"رمز البرق يشير إلى خطر كهربائي."},
+      {q:"عند وصول رذاذ مادة كيميائية إلى العين، أول إجراء إسعاف هو:",
+       o:["غسلها بماء جارٍ مدة طويلة وإبلاغ المعلم فوراً","فركها بقوة","تغطيتها وانتظار زوال الألم","وضع مادة أخرى عليها"],a:0,c:"الإسعاف الأولي للعين",
+       e:"الغسل السريع بالماء الجاري يخفف تركيز المادة ويقلل الضرر."},
+      {q:"عند حدوث حرق بسيط في اليد بسبب سطح ساخن، يكون الإجراء الأنسب:",
+       o:["تبريد المنطقة بماء جارٍ بارد ثم إبلاغ المعلم","فقع الفقاعات الجلدية","إهمال الحرق","وضع مادة دهنية مباشرة عليه"],a:0,c:"الإسعاف الأولي للحروق",
+       e:"التبريد بالماء الجاري يخفف أثر الحرق، ولا تُستخدم مواد غير معقمة."},
+      {q:"عند اشتعال جهاز كهربائي في المختبر، أنسب إجراء هو:",
+       o:["فصل التيار بأمان واستخدام طفاية مناسبة (مثل ثاني أكسيد الكربون) وإبلاغ المعلم","صب الماء مباشرة عليه","تركه يحترق","نفخ اللهب لإطفائه"],a:0,c:"الحريق الكهربائي",
+       e:"الماء موصل للكهرباء وقد يسبب صعقاً، فيجب فصل التيار واستخدام طفاية مناسبة."},
+      {q:"لتجنب خطر الصعق عند التعامل مع الأجهزة الكهربائية:",
+       o:["عدم لمسها بيدين مبللتين وتوصيل الدائرة بعد موافقة المعلم","لمس الأسلاك العارية لفحصها","استخدام مقابس مكسورة","توصيل أكثر من جهاز بمقبس واحد دائماً"],a:0,c:"السلامة الكهربائية",
+       e:"الماء يقلل مقاومة الجسم فيزيد خطر الصعق، والإشراف يضمن سلامة التوصيل."},
+      {q:"عند استخدام مؤشر الليزر في تجربة، يجب:",
+       o:["عدم توجيهه نحو العين أو الأشخاص وعدم النظر إلى شعاعه مباشرة","النظر إلى مصدره للتأكد من عمله","توجيهه إلى زميل أثناء التجربة","توجيهه نحو الأسطح العاكسة عمداً"],a:0,c:"سلامة الليزر",
+       e:"شعاع الليزر قد يتلف الشبكية حتى بالانعكاس."},
+      {q:"أي السلوكيات التالية صحيحة داخل المختبر؟",
+       o:["ارتداء النظارة الواقية والمعطف واتباع تعليمات المعلم","تناول الطعام والشراب أثناء التجربة","الركض بين الطاولات","استخدام الأدوات دون استئذان"],a:0,c:"قواعد السلوك الآمن في المختبر",
+       e:"الالتزام بأدوات الوقاية والتعليمات يحميك ويحمي زملاءك."},
+      {q:"عند كسر أداة زجاجية أثناء التجربة:",
+       o:["إبلاغ المعلم وعدم لمس القطع بالأيدي المجردة","جمع القطع بالأيدي بسرعة","إخفاء الكسر","رمي القطع في حوض الغسيل"],a:0,c:"التعامل مع الأدوات الزجاجية",
+       e:"قطع الزجاج حادة، ويُنظّف المكان بالأدوات المخصصة وبإشراف المعلم."}
+    ]
+  }
+];
+
+/* ===================== أدوات مساعدة ===================== */
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const LETTERS = ["أ","ب","ج","د"];
+const N = INDICATORS.length;
+const PER = 10;
+const TOTAL = N*PER;
+const mastery = CONFIG.MASTERY;
+
+const state = {
+  student:null, cur:0, items:[], qi:0, run:0, locked:false, answers:[],
+  res: INDICATORS.map(()=>({score:null, attempts:0, strong:[], weak:[]})),
+  sent:false
+};
+
+function show(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function totalScore(){
+  let t = 0;
+  state.res.forEach((r,i)=>{ if(i!==state.cur || !$("s-quiz").classList.contains("active")) t += (r.score||0); });
+  if($("s-quiz").classList.contains("active")) t += state.run;
+  return t;
+}
+
+function updateHeader(){
+  const quizActive = $("s-quiz").classList.contains("active");
+  let done = 0;
+  state.res.forEach((r,i)=>{ if(r.score!==null && !(quizActive && i===state.cur)) done += PER; });
+  if(quizActive) done += state.qi + (state.locked?1:0);
+  const pct = Math.round(done/TOTAL*100);
+  $("barFill").style.width = pct+"%";
+  $("barLabel").textContent = "التقدم: "+pct+"%";
+  $("barCount").textContent = done+" / "+TOTAL+" سؤالاً";
+  $("scoreChip").innerHTML = totalScore()+" <span>/ "+TOTAL+"</span>";
+  const st = $("stepper"); st.innerHTML = "";
+  INDICATORS.forEach((ind,i)=>{
+    const b = document.createElement("b");
+    b.textContent = (i+1)+". "+ind.short;
+    if(i===state.cur && (quizActive || $("s-intro").classList.contains("active") || $("s-feedback").classList.contains("active"))) b.className="cur";
+    else if(state.res[i].score!==null) b.className="done";
+    st.appendChild(b);
+  });
+}
+
+/* ===================== 1) تسجيل الدخول ===================== */
+$("masteryTxt").textContent = mastery;
+$("loginForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const name = $("stuName").value.trim().replace(/\s+/g," ");
+  const id = $("stuId").value.trim().replace(/[٠-٩]/g, d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
+  const parts = name.split(" ").filter(Boolean);
+  const arabicOnly = /^[\u0600-\u06FFa-zA-Z\s]+$/.test(name);
+  if(parts.length < 3 || !arabicOnly){ $("loginErr").textContent="الرجاء إدخال الاسم الثلاثي كاملاً (ثلاث كلمات على الأقل، بدون أرقام)."; return; }
+  if(!/^\d{6,12}$/.test(id)){ $("loginErr").textContent="رقم الهوية / الرقم الأكاديمي يجب أن يتكون من 6 إلى 12 رقماً."; return; }
+  $("loginErr").textContent = "";
+  state.student = {name, id};
+  $("whoLine").textContent = name;
+  const small = document.createElement("small"); small.textContent = "  |  "+id; $("whoLine").appendChild(small);
+  $("topbar").style.display = "block";
+  window.addEventListener("beforeunload", guardLeave);
+  openIntro(0);
+});
+function guardLeave(e){ if(!state.sent){ e.preventDefault(); e.returnValue=""; } }
+
+/* ===================== 2) مقدمة المؤشر ===================== */
+function openIntro(i){
+  state.cur = i;
+  const ind = INDICATORS[i];
+  $("inBadge").textContent = "المؤشر "+(i+1)+" من "+N;
+  $("inTitle").textContent = ind.title;
+  $("inDesc").textContent = ind.desc;
+  $("inTopics").innerHTML = "";
+  ind.topics.forEach(t=>{ const li=document.createElement("li"); li.textContent=t; $("inTopics").appendChild(li); });
+  show("s-intro"); updateHeader();
+}
+$("inStart").addEventListener("click", ()=>startIndicator(state.cur));
+
+/* ===================== 3) الأسئلة ===================== */
+function startIndicator(i){
+  state.cur = i;
+  const ind = INDICATORS[i];
+  state.items = shuffle(ind.questions).slice(0,PER).map(q=>{
+    const order = shuffle(q.o.map((_,k)=>k));
+    return {q:q.q, c:q.c, e:q.e, opts:order.map(k=>q.o[k]), correct:order.indexOf(q.a)};
+  });
+  state.qi = 0; state.run = 0; state.answers = []; state.locked = false;
+  show("s-quiz"); renderQ();
+}
+
+function renderQ(){
+  const ind = INDICATORS[state.cur];
+  const it = state.items[state.qi];
+  state.locked = false;
+  $("qBadge").textContent = "المؤشر "+(state.cur+1)+": "+ind.short;
+  $("qNum").textContent = "السؤال "+(state.qi+1)+" من "+PER+"  •  درجتك: "+state.run;
+  $("qText").textContent = it.q;
+  $("qExpl").className = "expl"; $("qExpl").textContent = "";
+  $("qNext").classList.add("hidden");
+  const box = $("qOpts"); box.innerHTML = "";
+  it.opts.forEach((t,k)=>{
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt";
+    const kk = document.createElement("span"); kk.className="k"; kk.textContent = LETTERS[k];
+    const tx = document.createElement("span"); tx.textContent = t;
+    b.append(kk, tx);
+    b.addEventListener("click", ()=>choose(k));
+    box.appendChild(b);
+  });
+  updateHeader();
+}
+
+function choose(k){
+  if(state.locked) return;
+  state.locked = true;
+  const it = state.items[state.qi];
+  const ok = (k===it.correct);
+  if(ok) state.run++;
+  state.answers.push({c:it.c, ok});
+  [...$("qOpts").children].forEach((b,idx)=>{
+    b.classList.add("locked");
+    if(idx===it.correct) b.classList.add("correct");
+    else if(idx===k) b.classList.add("wrong");
+  });
+  $("qExpl").textContent = (ok ? "إجابة صحيحة. " : "إجابة غير صحيحة. ") + it.e;
+  $("qExpl").classList.add("show");
+  $("qNum").textContent = "السؤال "+(state.qi+1)+" من "+PER+"  •  درجتك: "+state.run;
+  $("qNext").textContent = (state.qi===PER-1) ? "عرض التغذية الراجعة ←" : "السؤال التالي ←";
+  $("qNext").classList.remove("hidden");
+  updateHeader();
+}
+
+$("qNext").addEventListener("click", ()=>{
+  if(!state.locked) return;
+  if(state.qi < PER-1){ state.qi++; renderQ(); }
+  else finishIndicator();
+});
+
+/* ===================== 4) التغذية الراجعة ===================== */
+function finishIndicator(){
+  const i = state.cur;
+  const byC = {};
+  state.answers.forEach(a=>{ (byC[a.c] = byC[a.c] || {r:0,w:0}); a.ok ? byC[a.c].r++ : byC[a.c].w++; });
+  const strong = Object.keys(byC).filter(c=>byC[c].w===0);
+  const weak   = Object.keys(byC).filter(c=>byC[c].w>0);
+  const r = state.res[i];
+  r.score = state.run; r.attempts += 1; r.strong = strong; r.weak = weak;
+  renderFeedback(i);
+}
+
+function levelOf(p){
+  if(p>=90) return {t:"متقن بامتياز 🌟", c:"#15803d"};
+  if(p>=mastery) return {t:"تحقق الإتقان ✅", c:"#0f766e"};
+  if(p>=50) return {t:"قريب من الإتقان 📈", c:"#b45309"};
+  return {t:"يحتاج إلى مراجعة 📚", c:"#b91c1c"};
+}
+
+function renderFeedback(i){
+  const ind = INDICATORS[i], r = state.res[i];
+  const pct = Math.round(r.score/PER*100), lv = levelOf(pct);
+  $("fbBadge").textContent = "المؤشر "+(i+1)+" من "+N;
+  $("fbTitle").textContent = ind.title;
+  $("fbPct").textContent = pct+"%";
+  $("fbScore").textContent = r.score+" / "+PER;
+  $("fbRing").style.setProperty("--p", pct);
+  $("fbRing").style.setProperty("--c", lv.c);
+  $("fbLevel").textContent = "نسبة الإتقان: "+pct+"% — "+lv.t;
+  const fill = (id, arr, empty)=>{
+    const ul = $(id); ul.innerHTML="";
+    (arr.length?arr:[empty]).forEach(t=>{ const li=document.createElement("li"); li.textContent=t; ul.appendChild(li); });
+  };
+  fill("fbStrong", r.strong, "لا توجد مفاهيم متقنة بالكامل بعد، واصل المحاولة.");
+  fill("fbWeak", r.weak, "لا توجد مفاهيم تحتاج تحسيناً. أحسنت!");
+  const passed = pct>=mastery;
+  $("fbAdvice").textContent = passed
+    ? "أحسنت! حققت نسبة الإتقان المطلوبة ("+mastery+"%) في هذا المؤشر. يمكنك المتابعة."
+    : "لم تبلغ نسبة الإتقان المطلوبة ("+mastery+"%). راجع المفاهيم الظاهرة أعلاه ثم أعد اختبار هذا المؤشر وحده، أو تابع مع الاحتفاظ بدرجتك الحالية.";
+  $("fbRetry").classList.toggle("hidden", passed);
+  $("fbNext").textContent = (i<N-1) ? "المؤشر التالي ←" : "عرض الملخص النهائي ←";
+  show("s-feedback"); updateHeader();
+}
+$("fbRetry").addEventListener("click", ()=>startIndicator(state.cur));
+$("fbNext").addEventListener("click", ()=>{
+  if(state.cur < N-1) openIntro(state.cur+1);
+  else openSummary();
+});
+
+/* ===================== 5) الملخص والإرسال ===================== */
+function openSummary(){
+  const body = $("sumBody"); body.innerHTML = "";
+  let total = 0;
+  INDICATORS.forEach((ind,i)=>{
+    const r = state.res[i];
+    const score = r.score===null ? 0 : r.score;
+    total += score;
+    const pct = score/PER*100, ok = pct>=mastery;
+    const tr = document.createElement("tr");
+    const td1 = document.createElement("td"); td1.textContent = (i+1)+". "+ind.short;
+    const td2 = document.createElement("td"); td2.textContent = score+" / "+PER+"  ("+Math.round(pct)+"%)";
+    const td3 = document.createElement("td"); const tg = document.createElement("span");
+    tg.className = "tag "+(ok?"ok":"no"); tg.textContent = ok ? "متقن" : "دون الإتقان"; td3.appendChild(tg);
+    const td4 = document.createElement("td"); td4.textContent = r.attempts;
+    const td5 = document.createElement("td");
+    if(!ok && !state.sent){
+      const b = document.createElement("button"); b.className="btn warn"; b.style.padding="6px 12px"; b.textContent="🔁 إعادة";
+      b.addEventListener("click", ()=>startIndicator(i));
+      td5.appendChild(b);
+    }
+    tr.append(td1,td2,td3,td4,td5); body.appendChild(tr);
+  });
+  $("sumTotal").textContent = total+" / "+TOTAL;
+  $("sumSend").disabled = state.sent;
+  show("s-summary"); updateHeader();
+}
+
+function buildReport(){
+  const per = INDICATORS.map((ind,i)=>({
+    id: ind.id, title: ind.short, score: state.res[i].score||0, outOf: PER,
+    percent: Math.round((state.res[i].score||0)/PER*100), attempts: state.res[i].attempts,
+    weakConcepts: state.res[i].weak
+  }));
+  const total = per.reduce((s,p)=>s+p.score,0);
+  return {
+    test: CONFIG.TEST_TITLE,
+    studentName: state.student.name,
+    studentId: state.student.id,
+    indicators: per,
+    totalScore: total, totalOutOf: TOTAL,
+    totalPercent: Math.round(total/TOTAL*100),
+    submittedAt: new Date().toLocaleString("ar-SA",{dateStyle:"full", timeStyle:"short"})
+  };
+}
+
+function reportText(rp){
+  let t = rp.test+"\n\nاسم الطالب: "+rp.studentName+"\nرقم الهوية / الأكاديمي: "+rp.studentId+"\nوقت التسليم: "+rp.submittedAt+"\n\n";
+  rp.indicators.forEach(p=>{
+    t += "المؤشر "+p.id+" ("+p.title+"): "+p.score+" / "+p.outOf+" ("+p.percent+"%) — المحاولات: "+p.attempts+
+         (p.weakConcepts.length ? "\n   مفاهيم تحتاج تحسيناً: "+p.weakConcepts.join("، ") : "")+"\n";
+  });
+  t += "\nالدرجة الكلية: "+rp.totalScore+" / "+rp.totalOutOf+" ("+rp.totalPercent+"%)\n";
+  return t;
+}
+
+function flatPayload(rp){
+  const o = {
+    _subject: "نتيجة اختبار – "+rp.studentName,
+    "اسم الطالب": rp.studentName,
+    "رقم الهوية": rp.studentId
+  };
+  rp.indicators.forEach(p=>{ o["درجة المؤشر "+p.id+" ("+p.title+")"] = p.score+" / "+p.outOf; });
+  o["الدرجة الكلية"] = rp.totalScore+" / "+rp.totalOutOf;
+  o["النسبة"] = rp.totalPercent+"%";
+  o["وقت التسليم"] = rp.submittedAt;
+  o["التقرير الكامل"] = reportText(rp);
+  return o;
+}
+
+async function sendReport(){
+  const rp = buildReport();
+  const msg = $("sendMsg");
+  $("sumSend").disabled = true;
+  msg.innerHTML = ""; $("fallback").classList.add("hidden");
+  const note = (cls, t)=>{ msg.innerHTML=""; const d=document.createElement("div"); d.className="notice "+cls; d.textContent=t; msg.appendChild(d); };
+  const useForm = !!CONFIG.FORMSPREE_ENDPOINT, useScript = !!CONFIG.APPS_SCRIPT_URL;
+
+  if(!useForm && !useScript){
+    note("info","لم يُضبط ربط الإرسال التلقائي بعد (انظر CONFIG في الشيفرة). يمكنك إرسال التقرير يدوياً عبر الخيارات أدناه.");
+    prepareFallback(rp); $("sumSend").disabled = false; return;
+  }
+  note("info","جارٍ إرسال التقرير إلى المعلم...");
+  let ok = false;
+  try{
+    if(useForm){
+      const r = await fetch(CONFIG.FORMSPREE_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(flatPayload(rp))});
+      if(r.ok) ok = true;
+    }
+    if(useScript){
+      await fetch(CONFIG.APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(rp)});
+      ok = true;
+    }
+  }catch(err){ ok = false; }
+
+  if(ok){
+    state.sent = true;
+    window.removeEventListener("beforeunload", guardLeave);
+    note("ok","تم إرسال تقريرك إلى المعلم بنجاح. الدرجة الكلية: "+rp.totalScore+" / "+rp.totalOutOf+". بالتوفيق!");
+    openSummaryLocked();
+  }else{
+    note("bad","تعذّر الإرسال التلقائي (تحقق من الاتصال بالإنترنت). يمكنك المحاولة مجدداً أو استخدام الخيارات البديلة.");
+    prepareFallback(rp); $("sumSend").disabled = false;
+  }
+}
+function openSummaryLocked(){
+  document.querySelectorAll("#sumBody button").forEach(b=>b.remove());
+  $("sumSend").disabled = true;
+}
+function prepareFallback(rp){
+  const text = reportText(rp);
+  $("fallback").classList.remove("hidden");
+  $("mailLink").href = "mailto:"+encodeURIComponent(CONFIG.TEACHER_EMAIL)+"?subject="+encodeURIComponent("نتيجة اختبار – "+rp.studentName)+"&body="+encodeURIComponent(text);
+  $("copyBtn").onclick = async ()=>{ try{ await navigator.clipboard.writeText(text); $("copyBtn").textContent="✔ تم النسخ"; }catch(e){ $("copyBtn").textContent="تعذّر النسخ"; } };
+  $("dlBtn").onclick = ()=>{
+    const blob = new Blob([text],{type:"text/plain;charset=utf-8"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "نتيجة-"+rp.studentId+".txt"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  };
+}
+$("sumSend").addEventListener("click", sendReport);
+
+/* ===================== شيفرة Google Apps Script النموذجية =====================
+   1) أنشئ جدول Google Sheets، ثم: الامتدادات ← Apps Script، والصق:
+
+   function doPost(e){
+     var d = JSON.parse(e.postData.contents);
+     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+     if(sh.getLastRow()===0) sh.appendRow(["الوقت","الاسم","الهوية","م1","م2","م3","الكلي","النسبة"]);
+     sh.appendRow([d.submittedAt,d.studentName,d.studentId,
+       d.indicators[0].score,d.indicators[1].score,d.indicators[2].score,d.totalScore,d.totalPercent+"%"]);
+     MailApp.sendEmail("teacher@example.com","نتيجة اختبار – "+d.studentName,
+       "الاسم: "+d.studentName+"\nالهوية: "+d.studentId+"\nالمؤشر 1: "+d.indicators[0].score+"/10"+
+       "\nالمؤشر 2: "+d.indicators[1].score+"/10\nالمؤشر 3: "+d.indicators[2].score+"/10\nالكلي: "+d.totalScore+"/30");
+     return ContentService.createTextOutput("ok");
+   }
+
+   2) نشر ← نشر كتطبيق ويب (التنفيذ كـ: أنا، الوصول: أي شخص)، ثم ضع الرابط في CONFIG.APPS_SCRIPT_URL
+   ============================================================================ */
+</script>
+</body>
+</html>
